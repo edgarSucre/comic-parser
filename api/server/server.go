@@ -21,8 +21,11 @@ func NewServer(p domain.ComicProvider) *Server {
 
 func (s *Server) GetChapter(w http.ResponseWriter, r *http.Request) {
 	tempChap := strings.TrimPrefix(r.URL.Path, "/")
+	if tempChap == "" {
+		tempChap = "0"
+	}
 
-	chapter, err := strconv.ParseInt(tempChap, 10, 32)
+	chapter, err := strconv.Atoi(tempChap)
 	if err != nil || chapter < 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, `{"err": "%s"}`, "invalid Chapter: must be a postive number")
@@ -31,13 +34,7 @@ func (s *Server) GetChapter(w http.ResponseWriter, r *http.Request) {
 
 	comic, err := s.provider.GetCommic(int(chapter))
 	if err != nil {
-		if strings.Contains(err.Error(), "couldn't find the comic") {
-			w.WriteHeader(http.StatusNotFound)
-			fmt.Fprintf(w, `{"err": "%s"}`, err.Error())
-			return
-		}
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, `{"err": "%s"}`, err.Error())
+		setErrorResponse(w, err)
 		return
 	}
 
@@ -51,6 +48,16 @@ func (s *Server) GetChapter(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(response)
+}
+
+func setErrorResponse(w http.ResponseWriter, err error) {
+	if strings.Contains(err.Error(), "couldn't find the comic") {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, `{"err": "%s"}`, err.Error())
+		return
+	}
+	w.WriteHeader(http.StatusInternalServerError)
+	fmt.Fprintf(w, `{"err": "%s"}`, err.Error())
 }
 
 func (s *Server) Start(port string) error {

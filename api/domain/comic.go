@@ -12,6 +12,8 @@ type Comic struct {
 	Img        string `json:"img"`
 	Tittle     string `json:"title"`
 	Transcript string `json:"transcript"`
+	HasNext    bool
+	HasPrev    bool
 }
 
 type ComicProvider interface {

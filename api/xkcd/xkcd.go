@@ -19,11 +19,8 @@ func NewClient(env *config.ENV) *Client {
 }
 
 func (cl *Client) GetCommic(id int) (domain.Comic, error) {
-	resp, err := http.Get(fmt.Sprintf("%s/%d/info.0.json", cl.env.ComicHost, id))
+	resp, err := http.Get(getUrl(cl.env.ComicHost, id))
 	if err != nil {
-		if resp.StatusCode == http.StatusNotFound {
-			return domain.Comic{}, fmt.Errorf("couldn't find the comic with id: %d", id)
-		}
 		return domain.Comic{}, fmt.Errorf("internal error")
 	}
 
@@ -44,5 +41,20 @@ func (cl *Client) GetCommic(id int) (domain.Comic, error) {
 		return domain.Comic{}, fmt.Errorf("internal error")
 	}
 
+	comic.HasPrev = comic.Num > 1
+	comic.HasNext = hasNext(getUrl(cl.env.ComicHost, comic.Num+1))
+
 	return comic, nil
+}
+
+func hasNext(url string) bool {
+	resp, _ := http.Head(url)
+	return resp.StatusCode == 200
+}
+
+func getUrl(host string, id int) string {
+	if id == 0 {
+		return fmt.Sprintf("%s/info.0.json", host)
+	}
+	return fmt.Sprintf("%s/%d/info.0.json", host, id)
 }
