@@ -9,6 +9,9 @@ import (
 )
 
 func TestGetEnvironment(t *testing.T) {
+	os.Unsetenv("API_PORT")
+	os.Unsetenv("COMIC_HOST")
+
 	_, err := config.GetEnvironment()
 	if !strings.Contains(err.Error(), "API_PORT") {
 		t.Error("Failure, Expected error to contain API_PORT")
