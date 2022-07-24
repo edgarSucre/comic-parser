@@ -20,6 +20,7 @@ func NewServer(p domain.ComicProvider) *Server {
 }
 
 func (s *Server) GetChapter(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	tempChap := strings.TrimPrefix(r.URL.Path, "/")
 	if tempChap == "" {
 		tempChap = "0"
