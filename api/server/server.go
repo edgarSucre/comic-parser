@@ -20,8 +20,7 @@ func NewServer(p domain.ComicProvider) *Server {
 }
 
 func (s *Server) GetChapter(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	tempChap := strings.TrimPrefix(r.URL.Path, "/")
+	tempChap := strings.TrimPrefix(r.URL.Path, "/api/")
 	if tempChap == "" {
 		tempChap = "0"
 	}
@@ -63,7 +62,8 @@ func setErrorResponse(w http.ResponseWriter, err error) {
 
 func (s *Server) Start(port string) error {
 	router := http.NewServeMux()
-	router.HandleFunc("/", s.GetChapter)
+	router.HandleFunc("/api/", s.GetChapter)
+	router.Handle("/public/", http.FileServer(http.Dir("../../public")))
 
 	log.Printf("Listening on port: %s\n", port)
 	return http.ListenAndServe(fmt.Sprintf(":%s", port), router)

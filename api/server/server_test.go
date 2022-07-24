@@ -36,7 +36,7 @@ func TestGetChapter(t *testing.T) {
 	srv := server.NewServer(&MockProvier{})
 
 	t.Run("Invalid Chapter", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/fail", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/fail", nil)
 		res := httptest.NewRecorder()
 
 		srv.GetChapter(res, req)
@@ -52,7 +52,7 @@ func TestGetChapter(t *testing.T) {
 	})
 
 	t.Run("Internal Error", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/99", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/99", nil)
 		res := httptest.NewRecorder()
 
 		srv.GetChapter(res, req)
@@ -70,7 +70,7 @@ func TestGetChapter(t *testing.T) {
 	})
 
 	t.Run("Chapter not found", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/1", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/1", nil)
 		res := httptest.NewRecorder()
 
 		srv.GetChapter(res, req)
@@ -87,7 +87,7 @@ func TestGetChapter(t *testing.T) {
 	})
 
 	t.Run("Return Chapter", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/12", nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/12", nil)
 		res := httptest.NewRecorder()
 
 		srv.GetChapter(res, req)
