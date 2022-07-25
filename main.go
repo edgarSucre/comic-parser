@@ -17,10 +17,11 @@ func main() {
 	}
 
 	comicClient := xkcd.NewClient(env)
-	server := server.NewServer(comicClient)
+	srv := server.NewServer(comicClient)
 
 	router := http.NewServeMux()
-	router.HandleFunc("/api/", server.GetChapter)
+	router.HandleFunc("/api/", srv.ValidateIdMiddleware(srv.DataCacheMiddleware(srv.GetChapter)))
+	router.HandleFunc("/img", srv.ImgCacheMiddleware(srv.GetImage))
 	router.Handle("/", http.FileServer(http.Dir("./public")))
 
 	log.Printf("Listening on port: %s\n", env.ServerPort)
